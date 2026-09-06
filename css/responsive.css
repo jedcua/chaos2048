@@ -1,0 +1,14 @@
+/* ---------- Small screens ---------- */
+@media (max-width: 480px) {
+  #app { padding: 16px 8px; }
+  .logo { font-size: 52px; }
+  .tagline { font-size: 15px; margin-bottom: 18px; }
+  .score-box { min-width: 70px; padding: 5px 10px; }
+  .score-box .value { font-size: 18px; }
+  .btn { padding: 10px 14px; }
+  .btn.small { padding: 9px 14px; font-size: 15px; }
+  .chaos-value { min-width: 40px; font-size: 16px; }
+  .prob-name { font-size: 13px; }
+  .prob-desc { font-size: 11px; }
+  .prob-value { min-width: 40px; font-size: 14px; }
+}

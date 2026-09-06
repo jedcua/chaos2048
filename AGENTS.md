@@ -36,5 +36,5 @@ Plain `<script>` tags at the end of `<body>`, loaded in this order. All files sh
 ## Conventions
 
 - Plain `'use strict'` scripts with top-level `const`/`let` globals; no modules, bundler, or framework.
-- UI is inline `<style>` in `index.html`; DOM refs live in `state.js`; the 460px logical board is scaled by `fitBoard()` on resize.
+- Stylesheets live in `css/` — `base.css`, `menu.css`, `game.css`, `responsive.css`, linked in that order; DOM refs live in `state.js`; the 460px logical board is scaled by `fitBoard()` on resize.
 - New behavior that can be checked without a human gets an entry in `js/selftest.js` (restore any state it mutates).

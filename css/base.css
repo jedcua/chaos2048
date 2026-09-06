@@ -1,0 +1,57 @@
+/* base — reset, page chrome, shared components */
+
+:root { --mono: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overscroll-behavior: none; }
+button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(1100px 700px at 50% -10%, rgba(59, 63, 255, .28), transparent 60%),
+    radial-gradient(900px 600px at 90% 110%, rgba(255, 42, 109, .20), transparent 60%),
+    radial-gradient(700px 500px at 5% 95%, rgba(0, 229, 255, .14), transparent 60%),
+    #070b14;
+  color: #c9d7ea;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+/* Faint cyber grid over the whole page */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, .045) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+#app { width: 100%; max-width: 560px; padding: 28px 12px; position: relative; z-index: 1; }
+.hidden { display: none !important; }
+
+/* Shared button (menu, game header, overlays) */
+.btn {
+  font: inherit; font-weight: 600;
+  padding: 9px 18px;
+  border: 1px solid rgba(0, 229, 255, .35); border-radius: 5px;
+  background: rgba(13, 22, 40, .9); color: #bfe9ff;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease, transform .05s ease;
+}
+.btn:hover {
+  background: rgba(0, 229, 255, .1);
+  border-color: rgba(0, 229, 255, .8);
+  box-shadow: 0 0 12px rgba(0, 229, 255, .25);
+}
+.btn:active { transform: scale(.97); }
+.btn.primary {
+  background: linear-gradient(135deg, #00c8e6, #7c3aed);
+  border-color: rgba(0, 229, 255, .6); color: #fff;
+  font-size: 18px; padding: 12px 40px;
+  box-shadow: 0 0 16px rgba(0, 229, 255, .3);
+}
+.btn.primary:hover { filter: brightness(1.15); box-shadow: 0 0 22px rgba(0, 229, 255, .5); }
+
+.hint { margin-top: 22px; font-size: 14px; color: #5a6d8c; text-align: center; }

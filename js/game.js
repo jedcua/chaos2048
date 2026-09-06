@@ -20,10 +20,10 @@ function applyMove(dir, isPlayer) {
   const { moved, gained } = move(dir);
   if (!moved) return;
 
-  // Gravity hold: player moves are perpendicular to the pull. Settle the
-  // board in the pull direction right away — any tile that can still move
-  // there does — so scoring and the win/game-over checks below see the
-  // final positions.
+  // Gravity hold: after a player move, settle the board in the pull direction
+  // — any tile that can still move there does — so scoring and the win/
+  // game-over checks below see the final positions. If the player moved with
+  // the pull, nothing more can settle (the slide already reached the far edge).
   let total = gained;
   if (gravityDir && gravityDir !== dir) total += move(gravityDir).gained;
 
@@ -49,9 +49,9 @@ function applyMove(dir, isPlayer) {
   }
 
   // A stuck board under a gravity hold is NOT game over: the player may have
-  // no perpendicular moves (e.g. all tiles pulled into one full edge row with
-  // no merges), but chaos keeps reshaping the board — a swap can recreate a
-  // merge and a new pull opens other directions — so play resumes on its own.
+  // no legal moves (e.g. all tiles pinned to one full edge row with no merges),
+  // but chaos keeps reshaping the board — a swap can recreate a merge and a new
+  // pull opens other directions — so play resumes on its own.
   if (!gravityDir && !canMove()) gameOver(GAME_OVER_REASONS.noMoves);
 }
 
@@ -60,8 +60,8 @@ function tryMove(dir) {
   // Board-oriented input: dir is a direction in the board's own frame (the
   // logical grid), not a screen one — "up" always means the board's up edge,
   // wherever that edge appears on screen under the current rotation.
-  // Gravity hold: only moves perpendicular to the pull are allowed.
-  if (gravityDir && !PERP_DIRS[gravityDir].includes(dir)) { flashGravityBlocked(); return; }
+  // Gravity hold: only moving against the pull is blocked.
+  if (gravityDir && !HOLD_DIRS[gravityDir].includes(dir)) { flashGravityBlocked(); return; }
   applyMove(dir, true);
 }
 

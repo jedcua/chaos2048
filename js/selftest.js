@@ -83,12 +83,27 @@
     status = 'playing'; score = 0; won = false; runRecorded = false;
     gravityDir = 'up'; // active hold, as chaosGravity() would set it
     applyMove('up'); // the pending pull: all four tiles land in row 0
-    // Board is now stuck (no perpendicular moves) but 12 cells are empty,
+    // Board is now stuck (no legal moves) but 12 cells are empty,
     // so the game must keep running until chaos reshapes it.
     const ok = canMove() === false && status === 'playing' &&
       tiles.length === 4 && tiles.every(t => t.row === 0);
     clearBoard(); clearGravity(); status = 'menu';
     return ok;
+  });
+
+  test('gravity hold allows moving with the pull but not against it', () => {
+    clearBoard();
+    place(2, 0, 2);
+    status = 'playing'; score = 0; won = false; runRecorded = false;
+    gravityDir = 'down';
+    tryMove('down'); // with the pull: must go through and settle to row 3
+    const withPull = tiles.length === 2 && tiles.some(t => t.row === 3);
+    clearBoard();
+    place(2, 0, 2);
+    tryMove('up'); // against the pull: still blocked
+    const against = tiles.length === 1 && tiles[0].row === 2;
+    clearBoard(); clearGravity(); status = 'menu';
+    return withPull && against;
   });
 
   test('rotate chaos spins the board a quarter turn', () => {

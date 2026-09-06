@@ -11,7 +11,7 @@ const clampPct = p => Math.min(100, Math.max(0, Math.round(p)));
 const CHAOS_TYPES = [
   { key: 'swap',    label: 'Swap',    desc: 'two tiles swap places',            def: 15, run: chaosSwap },
   { key: 'freeze',  label: 'Freeze',  desc: 'a random tile freezes solid',      def: 15, run: chaosFreeze },
-  { key: 'gravity', label: 'Gravity', desc: 'keeps pulling tiles; side-moves only', def: 10, run: chaosGravity },
+  { key: 'gravity', label: 'Gravity', desc: 'keeps pulling; no moving against it', def: 10, run: chaosGravity },
   { key: 'rotate',  label: 'Rotate',  desc: 'spins the board a quarter turn',    def: 10, run: chaosRotate },
 ];
 
@@ -153,12 +153,12 @@ function doChaos() {
 
 /* Gravity: pull every tile in a random direction, exactly like a player move.
    The pull is continuous — while active (until the next chaos event) the
-   board settles in this direction after every player move (see applyMove)
-   and the player may only move perpendicular to the pull. The visual decays
-   with the chaos timer. */
+   board settles in this direction after every player move (see applyMove);
+   the player may also move with the pull — only moving against it is
+   forbidden. The visual decays with the chaos timer. */
 const GRAVITY_DIRS = ['up', 'down', 'left', 'right'];
 const GRAVITY_ARROWS = { up: '▲', down: '▼', left: '◀', right: '▶' };
-const PERP_DIRS = { up: ['left', 'right'], down: ['left', 'right'], left: ['up', 'down'], right: ['up', 'down'] };
+const HOLD_DIRS = { up: ['left', 'right', 'up'], down: ['left', 'right', 'down'], left: ['up', 'down', 'left'], right: ['up', 'down', 'right'] };
 let gravityDir = null;   // active pull direction, or null when no hold is in effect
 let gravityTimer = null; // pending pull
 

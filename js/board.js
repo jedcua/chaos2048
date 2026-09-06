@@ -114,8 +114,9 @@ function move(dir) {
 function canMove() {
   const base = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
   for (const t of tiles) base[t.row][t.col] = t;
-  // Under a gravity hold only perpendicular moves count as "possible".
-  const dirs = gravityDir ? PERP_DIRS[gravityDir] : ['up', 'down', 'left', 'right'];
+  // Under a gravity hold only legal moves count as "possible": perpendicular
+  // to the pull, or with it.
+  const dirs = gravityDir ? HOLD_DIRS[gravityDir] : ['up', 'down', 'left', 'right'];
   return dirs.some(dir => simMove(base, dir));
 }
 

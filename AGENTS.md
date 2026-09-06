@@ -5,7 +5,7 @@ Chaos 2048 — a single-page 2048 variant where random "chaos" events (swap, fre
 ## Run & verify
 
 - Open `index.html` directly in a browser (or serve the directory statically). No install, no build.
-- On load, `js/selftest.js` runs in-page self-tests and logs to the console; success = `SELF-TESTS: all passed`. This is the only test harness — check the browser console after changes.
+- Self-tests never auto-run; see `TESTS.md` for how to run them. `js/selftest.js` defines `runSelfTests()` — headless via `node test/run.js` (zero-dep Node, no browser), or explicit call from the devtools console. Success marker = `SELF-TESTS: all passed`. This is the only test harness — check the runner output after changes.
 
 ## Layout & load order
 
@@ -15,7 +15,7 @@ Plain `<script>` tags at the end of `<body>`, loaded in this order. All files sh
 2. `js/board.js` — board construction, tile DOM sync, `addRandomTile` (90% 2 / 10% 4, returns false when full), core `move(dir)` (edge-first slide+merge; per-tile `merged` flag reset after each call), `canMove()` / `simMove()` dry run on a scratch grid.
 3. `js/chaos.js` — chaos event system: weighted roulette (`CHAOS_TYPES`), settings persistence, gravity-hold + rotation mechanics, `chaosTick()` (driven by a 100ms `setInterval` in game.js).
 4. `js/game.js` — game flow (`applyMove`, `tryMove`, `gameOver`, overlays), input (arrow keys/Esc; non-passive touch listeners that claim swipe gestures so the page can't scroll mid-game), responsive `fitBoard()`, chaos menu wiring, init.
-5. `js/selftest.js` — IIFE self-tests; each mutates real game state and restores what it touched.
+5. `js/selftest.js` — defines `runSelfTests()`; each test mutates real game state and restores what it touched. Never auto-runs — invoked explicitly from the devtools console or headless (`node test/run.js`).
 
 ## Architecture invariants
 

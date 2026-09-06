@@ -1,9 +1,10 @@
 'use strict';
 
 /* ---------- Self-tests ---------- */
-// Run once on page load (while the menu is showing) and log results to the
-// console. They mutate real game state, so each test restores what it touched.
-(function selfTest() {
+// Never auto-runs: invoke explicitly — headless via `node test/run.js` or
+// from the devtools console. They mutate real game state, so each test
+// restores what it touched. Returns `{ lines, failed }`.
+function runSelfTests() {
   const lines = [];
   function test(name, fn) {
     let ok = false, err = '';
@@ -264,4 +265,5 @@
   for (const l of lines) console.log(l);
   const failed = lines.filter(l => l.startsWith('FAIL')).length;
   console.log(failed ? 'SELF-TESTS: ' + failed + ' FAILED' : 'SELF-TESTS: all passed');
-})();
+  return { lines, failed };
+}

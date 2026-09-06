@@ -1,0 +1,5 @@
+# Chaos 2048 is a pure static site — no build step.
+# Netlify publishes the repo root as-is; this file exists to hold future
+# config (headers, redirects) in one place.
+[build]
+  # No build command needed. Publish directory defaults to the repo root.

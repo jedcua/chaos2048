@@ -10,6 +10,17 @@ Open `index.html` directly in a browser (or serve the directory statically). No 
 
 On load, `js/selftest.js` runs in-page self-tests and logs to the console; success prints `SELF-TESTS: all passed`. This is the only test harness — check the browser console after changes.
 
+## Deploying to Netlify
+
+The site is fully static — no build step, no environment variables.
+
+1. Push the repo to GitHub (`origin` → `jedcua/chaos2048`).
+2. At [app.netlify.com/add](https://app.netlify.com/add), choose **Import project from Git** and pick the repo.
+3. Keep the defaults: no build command, publish directory = repo root (auto-detected for a static site).
+4. Click **Deploy site**.
+
+Every push to the default branch redeploys; pull requests get preview deploys. Custom domain goes under *Domain management*. One-off without Git: [drag & drop](https://app.netlify.com/drop) the project folder.
+
 ## Play
 
 - **Move**: arrow keys or swipe (touch).

@@ -83,6 +83,7 @@
   font-size: 20px; color: #fff; text-shadow: 0 0 4px rgba(80, 160, 255, .9);
 }
 .tile.froze { animation: frostFlash .5s ease; z-index: 3; }
+.tile.halved { animation: halveFlash .5s ease; z-index: 3; }
 
 @keyframes pop   { from { transform: scale(0); } to { transform: scale(1); } }
 @keyframes pulse { 50% { transform: scale(1.18); } }
@@ -93,6 +94,12 @@
 @keyframes frostFlash {
   0%, 100% { transform: none; }
   40% { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(140, 200, 255, .8); }
+}
+@keyframes halveFlash {
+  0%, 100% { transform: none; box-shadow: none; }
+  25% { transform: translateX(-6px) skewX(10deg); }
+  50% { transform: translateX(5px) scale(1.08); box-shadow: 0 0 0 5px rgba(255, 42, 109, .7); }
+  75% { transform: translateX(-3px) skewX(-6deg); }
 }
 
 /* Gravity chaos: directional pull indicator (arrow + glow on the pulled edge) */

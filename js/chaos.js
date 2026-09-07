@@ -9,10 +9,11 @@ const clampPct = p => Math.min(100, Math.max(0, Math.round(p)));
 // built by buildChaosRows()) and the weighted roll in doChaos() (run).
 // Adding a new event type = one entry here; nothing else to touch.
 const CHAOS_TYPES = [
-  { key: 'swap',    label: 'Swap',    desc: 'two tiles swap places',            def: 15, run: chaosSwap },
-  { key: 'freeze',  label: 'Freeze',  desc: 'a random tile freezes solid',      def: 15, run: chaosFreeze },
+  { key: 'swap',    label: 'Swap',    desc: 'two tiles swap places',               def: 15, run: chaosSwap },
+  { key: 'freeze',  label: 'Freeze',  desc: 'a random tile freezes solid',         def: 15, run: chaosFreeze },
   { key: 'gravity', label: 'Gravity', desc: 'keeps pulling; no moving against it', def: 10, run: chaosGravity },
-  { key: 'rotate',  label: 'Rotate',  desc: 'spins the board a quarter turn',    def: 10, run: chaosRotate },
+  { key: 'rotate',  label: 'Rotate',  desc: 'spins the board a quarter turn',      def: 10, run: chaosRotate },
+  { key: 'halve',   label: 'Halve',   desc: 'halves the highest tile; 2s are safe',    def: 15, run: chaosHalve },
 ];
 
 const CHAOS_DEF_SECS = 3;
@@ -121,6 +122,19 @@ function chaosFreeze() {
   void t.el.offsetWidth; // restart animation
   t.el.classList.add('froze');
   t.el.addEventListener('animationend', () => t.el.classList.remove('froze'), { once: true });
+}
+function chaosHalve() {
+  if (!tiles.length) return;
+  const top = Math.max(...tiles.map(t => t.value));
+  if (top === 2) return; // all tiles are 2 — nothing to halve
+  const pool = tiles.filter(t => t.value === top);
+  const t = pool[Math.floor(Math.random() * pool.length)];
+  t.value /= 2;
+  updateTileEl(t);
+  t.el.classList.remove('halved');
+  void t.el.offsetWidth; // restart animation
+  t.el.classList.add('halved');
+  t.el.addEventListener('animationend', () => t.el.classList.remove('halved'), { once: true });
 }
 
 // Roulette-wheel pick: subtract each type's own weight from the roll.

@@ -117,6 +117,28 @@ function runSelfTests() {
     boardRot = saved; renderBoardRot();
     return ok;
   });
+  test('halve event halves the highest tile and spares 2s', () => {
+    clearBoard();
+    place(0, 0, 4);
+    place(1, 1, 8);
+    chaosHalve();
+    const hit = tiles.length === 2 &&
+      tiles.every(t => t.value === 4 && String(t.el.textContent) === '4');
+    clearBoard();
+    place(0, 0, 8);
+    place(1, 1, 8);
+    place(2, 2, 4);
+    chaosHalve();
+    const tie = tiles.length === 3 &&
+      tiles.filter(t => t.value === 8).length === 1 &&
+      tiles.filter(t => t.value === 4).length === 2;
+    clearBoard();
+    place(0, 0, 2);
+    place(1, 1, 2);
+    chaosHalve();
+    const safe = tiles.length === 2 && tiles.every(t => t.value === 2);
+    return hit && tie && safe;
+  });
 
   test("input is read in the board's own frame under any rotation", () => {
     const saved = boardRot;

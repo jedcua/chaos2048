@@ -42,6 +42,7 @@ function addRandomTile() {
   t.el = document.createElement('div');
   updateTileEl(t);
   t.el.classList.add('new');
+  sndSpawn();
   board.appendChild(t.el);
   tiles.push(t);
   return true;
@@ -90,6 +91,7 @@ function move(dir) {
       m.value *= 2;
       m.merged = true;
       gained += m.value;
+      sndMerge(m.value);
       grid[r][c] = null;
       t.el.remove();
       tiles.splice(tiles.indexOf(t), 1);

@@ -11,6 +11,7 @@ function gameOver(reason) {
   status = 'over';
   lastGameOverReason = reason;
   recordRun();
+  sndGameOver();
   showOverlay('Game Over', reason + '<br>Final score: ' + score.toLocaleString(), 'Play Again', startGame, 'Menu', toMenu);
 }
 
@@ -18,7 +19,7 @@ function gameOver(reason) {
 // the per-move tile (player moves only), score, win check, game-over check.
 function applyMove(dir, isPlayer) {
   const { moved, gained } = move(dir);
-  if (!moved) return;
+  if (!moved) { if (isPlayer) sndBlocked(); return; }
 
   // Gravity hold: after a player move, settle the board in the pull direction
   // — any tile that can still move there does — so scoring and the win/
@@ -44,6 +45,7 @@ function applyMove(dir, isPlayer) {
   if (!won && tiles.some(t => t.value >= 2048)) {
     won = true;
     status = 'won';
+    sndWin();
     showOverlay('You win!', `${score.toLocaleString()} points`, 'Keep Going', () => { status = 'playing'; hideOverlay(); }, 'New Game', startGame);
     return;
   }
@@ -106,6 +108,7 @@ function startGame() {
   clearRotation();
   hideOverlay();
   showScreen('game');
+  sndStart();
   addRandomTile();
   addRandomTile();
 }
@@ -157,6 +160,7 @@ $('menuBtn').addEventListener('click', e => { e.currentTarget.blur(); toMenu(); 
 chaosMinus.addEventListener('click', e => { e.currentTarget.blur(); chaosSeconds = Math.max(1, chaosSeconds - 1); saveChaos(); renderChaosMenu(); });
 chaosPlus.addEventListener('click', e => { e.currentTarget.blur(); chaosSeconds = Math.min(60, chaosSeconds + 1); saveChaos(); renderChaosMenu(); });
 chaosReset.addEventListener('click', e => { e.currentTarget.blur(); resetChaosSettings(); });
+soundToggleBtn.addEventListener('click', e => { e.currentTarget.blur(); setSoundOn(!soundOn); });
 chaosToggle.addEventListener('click', e => {
   e.currentTarget.blur();
   const hidden = chaosBody.classList.toggle('hidden'); // true if the body just collapsed

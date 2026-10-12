@@ -176,7 +176,7 @@ for (const id of [
   'playBtn', 'newGameBtn', 'menuBtn',
   'chaosBox', 'chaosCount', 'chaosNext',
   'chaosMinus', 'chaosPlus', 'chaosValue', 'chaosReset',
-  'probRows', 'chaosToggle', 'chaosBody',
+  'probRows', 'chaosToggle', 'chaosBody', 'soundToggleBtn',
   'gravityFx', 'gravityArrow', 'boardRot',
 ]) byId[id] = new El('div');
 // Match the page's initial markup (index.html): the settings accordion starts
@@ -204,7 +204,7 @@ const localStorage = {
 
 /* ---------- Load the app in page order and run the self-tests ---------- */
 
-const FILES = ['js/state.js', 'js/board.js', 'js/chaos.js', 'js/game.js', 'js/selftest.js'];
+const FILES = ['js/state.js', 'js/sound.js', 'js/board.js', 'js/chaos.js', 'js/game.js', 'js/selftest.js'];
 const src = FILES.map(f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8')).join('\n;\n');
 // One compiled function scope == one page load: all top-level const/let of
 // the five scripts share it, exactly as in the browser. `new Function`

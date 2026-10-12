@@ -157,6 +157,7 @@ function doChaos() {
   // only startGame()/toMenu() reset it (via clearRotation()).
   if (!nextChaos) return; // no event was rolled (all odds at zero)
   nextChaos.run();
+  sndChaos(nextChaos.key);
   // A swap or freeze can leave a full board with nothing that can slide or
   // merge. That's terminal when no hold is active — a fresh pull just set one
   // above, so this only fires for the non-gravity events.
@@ -211,6 +212,20 @@ function flashGravityBlocked() {
   gravityArrow.classList.remove('blocked');
   void gravityArrow.offsetWidth; // restart animation
   gravityArrow.classList.add('blocked');
+  sndBlocked();
+}
+
+// Tension tick: one soft tick per whole second left, inside the same danger
+// window renderChaosCount() paints. Returns true when the tick fired.
+let lastDangerSec = -1;
+function dangerTick() {
+  const dangerAt = Math.max(1, Math.round(chaosSeconds * 0.3));
+  if (chaosRemaining > dangerAt * 1000) { lastDangerSec = -1; return false; }
+  const whole = Math.ceil(chaosRemaining / 1000);
+  if (whole === lastDangerSec) return false;
+  lastDangerSec = whole;
+  sndDanger();
+  return true;
 }
 
 /* Rotate: held, cumulative board orientation (like the gravity hold). The
@@ -245,6 +260,7 @@ function chaosTick() {
     chaosRemaining += chaosSeconds * 1000;
   }
   renderChaosCount();
+  dangerTick();
   renderGravityFx();
 }
 

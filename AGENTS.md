@@ -12,10 +12,11 @@ Chaos 2048 — a single-page 2048 variant where random "chaos" events (swap, fre
 Plain `<script>` tags at the end of `<body>`, loaded in this order. All files share one global scope (no imports) — keep the load order intact.
 
 1. `js/state.js` — constants (`SIZE=4`, `CELL/GAP/PAD`, 460px board), DOM refs (`$` helper), mutable game state (`tiles`, `score`, `best`, `status`), high-score persistence.
-2. `js/board.js` — board construction, tile DOM sync, `addRandomTile` (90% 2 / 10% 4, returns false when full), core `move(dir)` (edge-first slide+merge; per-tile `merged` flag reset after each call), `canMove()` / `simMove()` dry run on a scratch grid.
-3. `js/chaos.js` — chaos event system: weighted roulette (`CHAOS_TYPES`), settings persistence, gravity-hold + rotation mechanics, `chaosTick()` (driven by a 100ms `setInterval` in game.js).
-4. `js/game.js` — game flow (`applyMove`, `tryMove`, `gameOver`, overlays), input (arrow keys/Esc; non-passive touch listeners that claim swipe gestures so the page can't scroll mid-game), responsive `fitBoard()`, chaos menu wiring, init.
-5. `js/selftest.js` — defines `runSelfTests()`; each test mutates real game state and restores what it touched. Never auto-runs — invoked explicitly from the devtools console or headless (`node test/run.js`).
+2. `js/sound.js` — synthesized sound effects (Web Audio, no asset files, no library): mute flag + `setSoundOn`, the `play(name, notes)` cue builder, one `snd*` cue per game event, `CHAOS_CUES` per chaos type.
+3. `js/board.js` — board construction, tile DOM sync, `addRandomTile` (90% 2 / 10% 4, returns false when full), core `move(dir)` (edge-first slide+merge; per-tile `merged` flag reset after each call), `canMove()` / `simMove()` dry run on a scratch grid.
+4. `js/chaos.js` — chaos event system: weighted roulette (`CHAOS_TYPES`), settings persistence, gravity-hold + rotation mechanics, `chaosTick()` (driven by a 100ms `setInterval` in game.js), `dangerTick()` tension cue.
+5. `js/game.js` — game flow (`applyMove`, `tryMove`, `gameOver`, overlays), input (arrow keys/Esc; non-passive touch listeners that claim swipe gestures so the page can't scroll mid-game), responsive `fitBoard()`, chaos menu wiring (interval, weights, sound toggle), init.
+6. `js/selftest.js` — defines `runSelfTests()`; each test mutates real game state and restores what it touched. Never auto-runs — invoked explicitly from the devtools console or headless (`node test/run.js`).
 
 ## Architecture invariants
 
@@ -26,12 +27,14 @@ Plain `<script>` tags at the end of `<body>`, loaded in this order. All files sh
 - **Rotation is view-only**: `boardRot` accumulates quarter-turns (90+90=180); CSS transform only — the logical grid and input are always read in the board's own frame. Persists and accumulates across chaos events; only a new game or return to menu resets it (`clearRotation()`).
 - **`CHAOS_TYPES` is the single source of truth** for event types: each entry drives its weight, its menu row, and the roulette roll. Adding an event = one entry; nothing else to touch. Weights are independent 0–100 values normalized at roll time (`rollChaosType()` returns null when all odds are zero → no event fires).
 - Tiles are `{id, value, row, col, el}`; `frozen` tiles (freeze chaos) skip moves and merges in both `move()` and `simMove()`.
+- **Sound is synthesized at play time**: `js/sound.js` builds oscillator notes; the page ships no audio files and loads no library. `lastSound` names the cue a call asked for and stays `null` while muted, so the headless tests can assert wiring; every cue is a no-op when `AudioContext` is missing. `CHAOS_CUES` is keyed by `CHAOS_TYPES` key, and an event with no entry plays `CHAOS_CUE_DEFAULT` — a new event type still sounds with no other change.
 
 ## Persistence (localStorage)
 
 - `hs2048` — top 5 high scores (`{score, date}`), written once per run by `recordRun()` (skips score 0).
 - `best2048` — best score.
 - `chaos2048` — chaos settings (interval seconds + per-event weights); values clamped on load, corrupt JSON ignored.
+- `sound2048` — sound mute flag (`'1'`/`'0'`); default on, only an explicit `'0'` mutes.
 
 ## Conventions
 

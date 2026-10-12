@@ -17,6 +17,7 @@ const chaosMinus = $('chaosMinus'), chaosPlus = $('chaosPlus'), chaosValueEl = $
 const chaosReset = $('chaosReset');
 const probRows = $('probRows');
 const chaosToggle = $('chaosToggle'), chaosBody = $('chaosBody');
+const soundToggleBtn = $('soundToggleBtn');
 const gravityFx = $('gravityFx'), gravityArrow = $('gravityArrow');
 const boardRotEl = $('boardRot');
 

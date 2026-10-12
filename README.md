@@ -25,6 +25,7 @@ Every push to the default branch redeploys; pull requests get preview deploys. C
 
 - **Move**: arrow keys or swipe (touch).
 - **Menu**: Esc.
+- **Sound**: synthesized effects (merge, spawn, chaos event, win, loss) play through the Web Audio API. Toggle them from the Settings accordion; the setting persists.
 - Tiles merge as in classic 2048; reach the 2048 tile to win.
 - High scores: top 5 runs are kept in `localStorage` (`hs2048`) and shown on the menu.
 
@@ -47,6 +48,7 @@ Plain `<script>` tags at the end of `<body>`, loaded in this order. All files sh
 | File              | Contents |
 |-------------------|----------|
 | `js/state.js`     | Constants (`SIZE=4`, 460px board), DOM refs, mutable game state (`tiles`, `score`, `best`, `status`), high-score persistence. |
+| `js/sound.js`     | Synthesized sound effects (Web Audio API): mute flag + `setSoundOn`, the `play(name, notes)` cue builder, one `snd*` cue per game event, `CHAOS_CUES` keyed by chaos type. |
 | `js/board.js`     | Board construction, tile DOM sync, `addRandomTile` (90% 2 / 10% 4), core `move(dir)` (edge-first slide+merge), `canMove()` / `simMove()` dry run on a scratch grid. |
 | `js/chaos.js`     | Chaos event system: weighted roulette (`CHAOS_TYPES`), settings persistence, gravity-hold + rotation mechanics, `chaosTick()` driven by a 100ms `setInterval`. |
 | `js/game.js`      | Game flow (`applyMove`, `tryMove`, `gameOver`, overlays), input (arrow keys/Esc; non-passive touch listeners that claim swipe gestures so the page can't scroll mid-game), responsive `fitBoard()`, chaos menu wiring, init. |
@@ -67,6 +69,7 @@ Plain `<script>` tags at the end of `<body>`, loaded in this order. All files sh
 | `hs2048`    | Top 5 high scores (`{score, date}`), written once per run by `recordRun()` (skips score 0). |
 | `best2048`  | Best score. |
 | `chaos2048` | Chaos settings (interval seconds + per-event weights); values clamped on load, corrupt JSON ignored. |
+| `sound2048` | Sound mute flag (`'1'`/`'0'`); default on, only an explicit `'0'` mutes. |
 
 ## Conventions
 

@@ -283,6 +283,69 @@ function runSelfTests() {
     return moved && rotated;
   });
 
+  test('addRandomTile asks for the spawn cue', () => {
+    clearBoard();
+    addRandomTile();
+    const ok = lastSound === 'spawn';
+    clearBoard();
+    return ok;
+  });
+
+  test('a merge asks for the merge cue', () => {
+    clearBoard();
+    place(3, 0, 2); place(3, 1, 2);
+    move('left'); // merge path only: the per-move spawn cue would overwrite it
+    const ok = lastSound === 'merge';
+    clearBoard();
+    return ok;
+  });
+
+  test('a move that changes nothing asks for the blocked cue', () => {
+    clearBoard();
+    place(0, 0, 2); // already at the top edge; up does nothing
+    status = 'playing'; score = 0; won = false; runRecorded = false;
+    applyMove('up', true);
+    const ok = lastSound === 'blocked';
+    clearBoard(); status = 'menu';
+    return ok;
+  });
+
+  test('each chaos event asks for its own cue', () => {
+    let ok = true;
+    for (const t of CHAOS_TYPES) ok = ok && (sndChaos(t.key), lastSound === t.key);
+    return ok;
+  });
+
+  test('merge pitch drops as the tile value grows', () => {
+    return mergeFreq(2) > mergeFreq(4) && mergeFreq(2048) < mergeFreq(1024);
+  });
+
+  test('the danger tick fires once per second inside the danger window', () => {
+    const savedSecs = chaosSeconds, savedRemaining = chaosRemaining, savedLast = lastDangerSec;
+    chaosSeconds = 3;
+    chaosRemaining = 1000; // inside the 1s window renderChaosCount() paints
+    const first = dangerTick();
+    const repeat = dangerTick(); // same whole second → no second tick
+    chaosRemaining = 2900; // outside the window → no tick
+    const outside = dangerTick();
+    const ok = first === true && repeat === false && outside === false;
+    chaosSeconds = savedSecs; chaosRemaining = savedRemaining; lastDangerSec = savedLast;
+    return ok;
+  });
+
+  test('setSoundOn(false) silences every cue and saves the flag', () => {
+    const saved = localStorage.getItem(SND_KEY);
+    const before = lastSound;
+    setSoundOn(false);
+    const shown = soundToggleBtn.textContent === 'Sound: off';
+    sndMerge(4); // muted: nothing is recorded
+    const silent = lastSound === before;
+    setSoundOn(true);
+    if (saved === null) localStorage.removeItem(SND_KEY);
+    else localStorage.setItem(SND_KEY, saved);
+    return shown && silent && soundOn === true;
+  });
+
   console.log('%cChaos 2048 self-tests', 'font-weight:bold');
   for (const l of lines) console.log(l);
   const failed = lines.filter(l => l.startsWith('FAIL')).length;

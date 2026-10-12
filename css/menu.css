@@ -62,6 +62,7 @@
 .prob-desc { font-size: 12px; color: #5a6d8c; }
 .prob-value { min-width: 44px; text-align: center; font-size: 16px; font-weight: 700; color: #eaf6ff; font-family: var(--mono); }
 .chaos-reset { display: block; margin: 14px auto 0; }
+.sound-toggle { display: block; margin: 14px auto 0; }
 .rank { width: 22px; text-align: center; color: #4dd8ff; font-weight: 700; }
 .hs-score { font-weight: 700; flex: 1; color: #eaf6ff; font-family: var(--mono); }
 .hs-date { font-size: 13px; color: #5a6d8c; }

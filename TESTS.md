@@ -10,7 +10,7 @@ From the repo root:
 node test/run.js
 ```
 
-Zero dependencies (Node stdlib only, no browser). Loads the five app scripts in page order into one shared scope against a minimal DOM shim (`test/run.js`) and runs `runSelfTests()`. Output matches the browser console: header, one line per test, final banner. Exit code: `0` = all passed, `1` = failures (banner says `N FAILED`).
+Zero dependencies (Node stdlib only, no browser). Loads the six app scripts in page order into one shared scope against a minimal DOM shim (`test/run.js`) and runs `runSelfTests()`. Output matches the browser console: header, one line per test, final banner.
 
 If a future test needs a DOM API the shim lacks, extend `test/run.js` — app code is never changed for testability.
 

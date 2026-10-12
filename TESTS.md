@@ -14,6 +14,9 @@ Zero dependencies (Node stdlib only, no browser). Loads the six app scripts in p
 
 If a future test needs a DOM API the shim lacks, extend `test/run.js` — app code is never changed for testability.
 
+The runner also shims `AudioContext` (a node graph with a clock frozen at 0), so `audio()` succeeds and the background-music loop really runs headless. The shim records nothing; the music tests read the app's own globals (`musicClock`, `musicBar`, `musicGain.gain.value`).
+
+
 ## Explicit console call
 
 Open `index.html` and, in the devtools console:

@@ -164,6 +164,45 @@ class Touch {
   constructor(init) { Object.assign(this, init); } // data object, not an event
 }
 
+/* ---------- Web Audio shim: the node graph the app wires ----------
+   The app only asks the engine to place notes on a clock. This shim keeps that
+   clock frozen at 0 and accepts the wiring, so the music loop's scheduling
+   runs headless. The self-tests read the app's own globals (musicClock,
+   musicBar, musicGain.gain.value) — never this shim's internals. */
+class GainNode {
+  constructor() {
+    this.gain = {
+      value: 1,
+      setValueAtTime(v, t) { this.value = v; },
+      linearRampToValueAtTime(v, t) { this.value = v; },
+      exponentialRampToValueAtTime(v, t) { this.value = v; },
+    };
+  }
+  connect(target) { this.sink = target; }
+}
+class OscillatorNode {
+  constructor() {
+    this.type = 'medium';
+    this.frequency = {
+      value: 440,
+      setValueAtTime(v, t) { this.value = v; },
+      exponentialRampToValueAtTime(v, t) { this.value = v; },
+    };
+  }
+  connect(target) { this.sink = target; }
+  start(t) { this.startAt = t; }
+  stop(t) { this.stopAt = t; }
+}
+class AudioContext {
+  get currentTime() { return 0; } // frozen: the tests set the music clock themselves
+  get destination() { return { name: 'destination' }; }
+  createGain() { return new GainNode(); }
+  createOscillator() { return new OscillatorNode(); }
+}
+// `new Function` bodies resolve free names against the real global object, so
+// this shim — unlike the parameter shims below — has to be installed there.
+globalThis.AudioContext = AudioContext;
+
 /* ---------- Page globals the app scripts close over ---------- */
 
 // Every id state.js grabs via $().

@@ -346,6 +346,108 @@ function runSelfTests() {
     return shown && silent && soundOn === true;
   });
 
+  test('the music tuning ruler: an octave doubles the pitch', () => {
+    return semitoneHz(12) === 2 * semitoneHz(0) && 2 * semitoneHz(-12) === semitoneHz(0);
+  });
+
+  test('every bar names a pattern that exists and steps inside its own chord', () => {
+    for (const bar of MUSIC_PROGRESSION) {
+      const pattern = MUSIC_PATTERNS[bar.pattern || 'roll'];
+      if (!pattern) return false;
+      for (const step of pattern) if (step >= bar.arp.length) return false;
+    }
+    return MUSIC_PROGRESSION.length >= 2;
+  });
+
+  test('musicTick() tops up the lookahead window with whole bars', () => {
+    const savedClock = musicClock, savedBar = musicBar;
+    musicTick(); // the first tick builds the audio engine
+    musicClock = audioCtx.currentTime + 0.1; // a window with room for one more bar
+    const longest = Math.max(...MUSIC_PROGRESSION.map(barSeconds));
+    const barBefore = musicBar;
+    musicTick();
+    const ok = musicBar > barBefore
+      && musicClock >= audioCtx.currentTime + MUSIC_LOOKAHEAD
+      && musicClock < audioCtx.currentTime + MUSIC_LOOKAHEAD + longest;
+    musicClock = savedClock; musicBar = savedBar;
+    return ok;
+  });
+
+  test('a loop behind the audio clock restarts ahead of it, never in the past', () => {
+    const savedClock = musicClock, savedBar = musicBar;
+    musicClock = audioCtx.currentTime - 3;
+    musicTick();
+    const ok = musicClock >= audioCtx.currentTime && musicBar > savedBar;
+    musicClock = savedClock; musicBar = savedBar;
+    return ok;
+  });
+
+
+  test('the form turns the opening block four times and the lift twice', () => {
+    const key = (b) => b.bass + ':' + b.arp.join();
+    if (MUSIC_PROGRESSION.length !== 24) return false;
+    const opening = MUSIC_PROGRESSION.slice(0, 4).map(key);
+    const lift = MUSIC_PROGRESSION.slice(16, 20).map(key);
+    for (let i = 0; i < 24; i += 4) {
+      const want = i < 16 ? opening : lift;
+      for (let j = 0; j < 4; j++) if (key(MUSIC_PROGRESSION[i + j]) !== want[j]) return false;
+    }
+    return true;
+  });
+
+  test('the lift plays louder than the opening block, which stays even', () => {
+    const swells = MUSIC_PROGRESSION.map((b) => b.swell || 1);
+    return Math.max(...swells) > swells[0] && swells.slice(0, 16).every((s) => s === swells[0]);
+  });
+  test('the lift introduces chords the opening block never plays', () => {
+    const key = (b) => b.bass + ':' + b.arp.join();
+    const opening = new Set(MUSIC_PROGRESSION.slice(0, 4).map(key));
+    return MUSIC_PROGRESSION.slice(16, 20).filter((b) => !opening.has(key(b))).length >= 2;
+  });
+
+  test('every pattern holds the same number of steps, so the pulse stays fixed', () => {
+    const lengths = new Set(Object.values(MUSIC_PATTERNS).map((p) => p.length));
+    return lengths.size === 1;
+  });
+
+  test('every bar lasts the same time, so the loop keeps one pulse', () => {
+    const seconds = MUSIC_PROGRESSION.map(barSeconds);
+    return seconds.every((s) => s === seconds[0]);
+  });
+
+  test('the lift changes the note order, not just the chords', () => {
+    const patterns = new Set(MUSIC_PROGRESSION.map((b) => b.pattern || 'roll'));
+    return patterns.size >= 2;
+  });
+
+  test('the wrap resolves back into the opening chord', () => {
+    const first = MUSIC_PROGRESSION[0];
+    const last = MUSIC_PROGRESSION[MUSIC_PROGRESSION.length - 1];
+    // The closing G sits a whole step below the opening root A.
+    return first.bass - last.bass === 2;
+  });
+
+  test('muting zeroes the music knob and stops the loop', () => {
+    const saved = localStorage.getItem(SND_KEY);
+    const savedClock = musicClock, savedBar = musicBar;
+    setSoundOn(false);
+    const silenced = musicGain.gain.value === 0;
+    musicTick(); // must schedule nothing
+    const stopped = musicClock === savedClock && musicBar === savedBar;
+    setSoundOn(true);
+    if (saved === null) localStorage.removeItem(SND_KEY);
+    else localStorage.setItem(SND_KEY, saved);
+    // A real GainNode keeps the value in float32, so compare with a tolerance.
+    const restored = Math.abs(musicGain.gain.value - MUSIC_LEVEL) < 1e-6;
+    return silenced && stopped && restored;
+  });
+
+  test('the music loop never claims an effect name in lastSound', () => {
+    const before = lastSound;
+    musicTick();
+    return lastSound === before;
+  });
+
   console.log('%cChaos 2048 self-tests', 'font-weight:bold');
   for (const l of lines) console.log(l);
   const failed = lines.filter(l => l.startsWith('FAIL')).length;
